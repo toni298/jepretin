@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventQrCodeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Guest\PublicGalleryController;
 use App\Http\Controllers\GuestEventController;
 use App\Http\Controllers\GuestPhotoController;
 use App\Http\Controllers\ProfileController;
@@ -34,6 +35,11 @@ Route::get('/e/{publicEvent:slug}', [GuestEventController::class, 'upload'])
     ->name('guest.events.show');
 Route::get('/e/{publicEvent:slug}/invitation', [GuestEventController::class, 'invitation'])
     ->name('guest.events.invitation');
+Route::get('/e/{publicEvent:slug}/gallery', [PublicGalleryController::class, 'index'])
+    ->name('public.events.gallery');
+Route::get('/e/{publicEvent:slug}/gallery/photos', [PublicGalleryController::class, 'photos'])
+    ->middleware('throttle:60,1')
+    ->name('public.events.gallery.photos');
 Route::get('/e/{publicEvent:slug}/qr.svg', [GuestEventController::class, 'qr'])
     ->name('guest.events.qr');
 Route::post('/e/{publicEvent:slug}/upload-url', [GuestPhotoController::class, 'uploadUrl'])

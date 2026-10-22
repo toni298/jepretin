@@ -41,6 +41,10 @@ php artisan boost:install
 
 Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
 
+## Public event galleries
+
+Active events have a public gallery at `/e/{event-slug}/gallery`. Photos load directly from the configured public Supabase Storage bucket, with cursor-paginated results at `/e/{event-slug}/gallery/photos`. Apply the gallery cursor index migration with `php artisan migrate` when deploying this feature.
+
 ## Contributing
 
 Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).

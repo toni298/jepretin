@@ -11,6 +11,7 @@ defineProps<{
     event: WeddingEvent
     guestUrl: string
     guestUploadUrl: string
+    galleryUrl: string | null
     qrCodeUrl: string | null
     coverPhotoUrl: string | null
 }>()
@@ -73,6 +74,15 @@ function formatDate(date: string | null | undefined): string {
                     class="inline-flex items-center gap-2 text-sm font-medium text-emerald-300 hover:text-emerald-200"
                 >
                     Buka halaman tamu <ArrowUpRight :size="16" aria-hidden="true" />
+                </a>
+                <a
+                    v-if="galleryUrl"
+                    :href="galleryUrl"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="inline-flex items-center gap-2 text-sm font-medium text-emerald-300 hover:text-emerald-200"
+                >
+                    Buka galeri publik <ArrowUpRight :size="16" aria-hidden="true" />
                 </a>
             </div>
 

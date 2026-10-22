@@ -13,6 +13,7 @@ const props = defineProps<{
         eventDate: string | null
         location: string | null
         coverPhotoUrl: string | null
+        galleryUrl: string
     }
 }>()
 
@@ -202,6 +203,13 @@ async function onFileChange(event: Event): Promise<void> {
             <p class="text-xs leading-5" :class="event.coverPhotoUrl ? 'text-white/60' : 'text-stone-400'">
                 Foto akan dikompresi sebelum diunggah. Maksimal 20 MB per foto. Gunakan sesi tamu lokal agar daftar foto tetap terpisah.
             </p>
+            <a
+                :href="event.galleryUrl"
+                class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#b5a277]/50 px-5 py-2.5 text-sm font-semibold transition hover:bg-white/70 focus:outline-none focus:ring-4 focus:ring-amber-500/20"
+                :class="event.coverPhotoUrl ? 'text-white hover:bg-white/10' : 'text-stone-700'"
+            >
+                Lihat galeri foto acara
+            </a>
         </div>
     </article>
 </template>

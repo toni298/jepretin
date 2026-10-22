@@ -64,6 +64,9 @@ class EventController extends Controller
         return Inertia::render('Event/Show', [
             'event' => $event,
             'guestUrl' => route('guest.events.show', ['publicEvent' => $event->slug]),
+            'galleryUrl' => $event->status === 'active'
+                ? route('public.events.gallery', ['publicEvent' => $event->slug])
+                : null,
             'guestUploadUrl' => $event->upload_token
                 ? route('guest.events.upload-token', ['uploadToken' => $event->upload_token])
                 : route('guest.events.show', ['publicEvent' => $event->slug]),

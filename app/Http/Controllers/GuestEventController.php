@@ -29,6 +29,7 @@ class GuestEventController extends Controller
                 'eventDate' => $publicEvent->event_date?->toDateString(),
                 'location' => $publicEvent->location,
                 'coverPhotoUrl' => $coverPhotoUrl,
+                'galleryUrl' => route('public.events.gallery', ['publicEvent' => $publicEvent->slug]),
             ],
             'seo' => $this->eventMetadata(
                 $publicEvent,

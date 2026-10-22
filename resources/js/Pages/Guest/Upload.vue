@@ -12,6 +12,7 @@ defineProps<{
         eventDate: string | null
         location: string | null
         coverPhotoUrl: string | null
+        galleryUrl: string
     }
     seo: {
         title: string
