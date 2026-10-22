@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { ArrowDownToLine, ArrowLeft, ArrowRight, Camera, Images, Minus, Plus, X } from '@lucide/vue'
+import { computed, ref } from 'vue'
+import { Camera, Images } from '@lucide/vue'
 import PageMetadata from '@/Components/UI/PageMetadata.vue'
 import InvitationLayout from '@/Layouts/InvitationLayout.vue'
+import GalleryLightbox from '@/Pages/Guest/Components/GalleryLightbox.vue'
 
 interface GalleryPhoto {
     id: string
@@ -49,7 +50,6 @@ const hasMore = ref(props.hasMore)
 const isLoadingMore = ref(false)
 const loadError = ref('')
 const activePhotoIndex = ref<number | null>(null)
-const zoom = ref(1)
 
 const selectedPhoto = computed(() => (
     activePhotoIndex.value === null ? null : photos.value[activePhotoIndex.value] ?? null
@@ -64,44 +64,24 @@ const eventDateLabel = computed(() => {
     }).format(new Date(`${props.event.eventDate}T12:00:00`))
 })
 
-function openPhoto(index: number): void {
-    activePhotoIndex.value = index
-    zoom.value = 1
-}
-
 function closePhoto(): void {
     activePhotoIndex.value = null
-    zoom.value = 1
+}
+
+function openPhoto(index: number): void {
+    activePhotoIndex.value = index
 }
 
 function showPreviousPhoto(): void {
     if (activePhotoIndex.value === null || photos.value.length === 0) return
 
     activePhotoIndex.value = (activePhotoIndex.value - 1 + photos.value.length) % photos.value.length
-    zoom.value = 1
 }
 
 function showNextPhoto(): void {
     if (activePhotoIndex.value === null || photos.value.length === 0) return
 
     activePhotoIndex.value = (activePhotoIndex.value + 1) % photos.value.length
-    zoom.value = 1
-}
-
-function handleKeydown(event: KeyboardEvent): void {
-    if (activePhotoIndex.value === null) return
-
-    if (event.key === 'Escape') closePhoto()
-    if (event.key === 'ArrowLeft') showPreviousPhoto()
-    if (event.key === 'ArrowRight') showNextPhoto()
-}
-
-function zoomIn(): void {
-    zoom.value = Math.min(zoom.value + 0.5, 3)
-}
-
-function zoomOut(): void {
-    zoom.value = Math.max(zoom.value - 0.5, 1)
 }
 
 async function loadMore(): Promise<void> {
@@ -139,8 +119,6 @@ async function loadMore(): Promise<void> {
     }
 }
 
-onMounted(() => window.addEventListener('keydown', handleKeydown))
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
 </script>
 
 <template>
@@ -244,48 +222,15 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
             </div>
             </section>
 
-            <div
-            v-if="selectedPhoto"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-3 text-white sm:p-6"
-            role="dialog"
-            aria-modal="true"
-            :aria-label="`Pratinjau foto ${selectedPhoto.fileName}`"
-            @click.self="closePhoto"
-        >
-            <div class="absolute inset-x-3 top-3 flex items-center justify-between gap-3 sm:inset-x-6 sm:top-6">
-                <p class="min-w-0 truncate text-sm text-white/75">{{ selectedPhoto.fileName }}</p>
-                <div class="flex shrink-0 items-center gap-2">
-                    <button type="button" class="rounded-full bg-white/10 p-2.5 transition hover:bg-white/20 disabled:opacity-40" aria-label="Perkecil foto" :disabled="zoom <= 1" @click="zoomOut">
-                        <Minus :size="19" aria-hidden="true" />
-                    </button>
-                    <button type="button" class="rounded-full bg-white/10 p-2.5 transition hover:bg-white/20 disabled:opacity-40" aria-label="Perbesar foto" :disabled="zoom >= 3" @click="zoomIn">
-                        <Plus :size="19" aria-hidden="true" />
-                    </button>
-                    <a :href="selectedPhoto.downloadUrl" :download="selectedPhoto.fileName" class="rounded-full bg-emerald-400 p-2.5 text-slate-950 transition hover:bg-emerald-300" aria-label="Unduh foto">
-                        <ArrowDownToLine :size="19" aria-hidden="true" />
-                    </a>
-                    <button type="button" class="rounded-full bg-white/10 p-2.5 transition hover:bg-white/20" aria-label="Tutup foto" @click="closePhoto">
-                        <X :size="20" aria-hidden="true" />
-                    </button>
-                </div>
-            </div>
-
-            <button type="button" class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 transition hover:bg-white/20 sm:left-6" aria-label="Foto sebelumnya" @click="showPreviousPhoto">
-                <ArrowLeft :size="22" aria-hidden="true" />
-            </button>
-            <div class="flex size-full items-center justify-center overflow-auto pb-12 pt-16">
-                <img
-                    :src="selectedPhoto.url"
-                    :alt="selectedPhoto.fileName"
-                    loading="lazy"
-                    class="max-h-full max-w-full object-contain transition-transform duration-200"
-                    :style="{ transform: `scale(${zoom})` }"
-                >
-            </div>
-            <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-2.5 transition hover:bg-white/20 sm:right-6" aria-label="Foto berikutnya" @click="showNextPhoto">
-                <ArrowRight :size="22" aria-hidden="true" />
-            </button>
-            </div>
+            <GalleryLightbox
+                v-if="selectedPhoto && activePhotoIndex !== null"
+                :photo="selectedPhoto"
+                :index="activePhotoIndex"
+                :total="photos.length"
+                @close="closePhoto"
+                @previous="showPreviousPhoto"
+                @next="showNextPhoto"
+            />
         </div>
     </div>
 </template>
