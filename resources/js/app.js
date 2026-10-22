@@ -3,7 +3,10 @@ import { createApp, h } from 'vue'
 import { MotionPlugin } from '@vueuse/motion'
 import '@vuepic/vue-datepicker/dist/main.css'
 
-const appName = import.meta.env.VITE_APP_NAME || 'Jepretin'
+const configuredAppName = import.meta.env.VITE_APP_NAME
+const appName = configuredAppName && !/^\$\{[^}]+\}$/.test(configuredAppName)
+    ? configuredAppName
+    : 'Jepretin'
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),

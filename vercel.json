@@ -52,9 +52,11 @@
         }
     ],
     "env": {
+        "APP_NAME": "Jepretin",
         "APP_ENV": "production",
         "APP_DEBUG": "false",
         "APP_URL": "https://jepretin2-five.vercel.app/",
+        "VITE_APP_NAME": "Jepretin",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
