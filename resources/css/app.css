@@ -3,7 +3,75 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.dp--theme-dark {
+    --dp-background-color: var(--color-slate-900);
+    --dp-text-color: var(--color-slate-100);
+    --dp-hover-color: var(--color-slate-800);
+    --dp-hover-text-color: var(--color-white);
+    --dp-primary-color: var(--color-emerald-400);
+    --dp-primary-text-color: var(--color-slate-950);
+    --dp-secondary-color: var(--color-slate-400);
+    --dp-border-color: var(--color-slate-700);
+    --dp-menu-border-color: var(--color-slate-700);
+    --dp-border-color-hover: var(--color-emerald-400);
+    --dp-border-color-focus: var(--color-emerald-400);
+    --dp-disabled-color: var(--color-slate-800);
+    --dp-disabled-color-text: var(--color-slate-500);
+    --dp-scroll-bar-background: var(--color-slate-900);
+    --dp-scroll-bar-color: var(--color-slate-700);
+    --dp-icon-color: var(--color-slate-400);
+    --dp-highlight-color: color-mix(in oklab, var(--color-emerald-400) 16%, transparent);
+    --dp-range-between-dates-background-color: color-mix(in oklab, var(--color-emerald-400) 16%, var(--color-slate-900));
+    --dp-range-between-dates-text-color: var(--color-emerald-100);
+    --dp-range-between-border-color: color-mix(in oklab, var(--color-emerald-400) 25%, var(--color-slate-900));
+    --dp-loader: 5px solid var(--color-emerald-400);
+}
+
+.dp--theme-dark .jepretin-date-input {
+    width: 100%;
+    min-height: 50px;
+    border-radius: 0.75rem;
+    border-width: 1px;
+    border-color: var(--color-slate-700);
+    background-color: color-mix(in oklab, var(--color-slate-950) 70%, transparent);
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    color: var(--color-white);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    box-shadow: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.dp--theme-dark .jepretin-date-input::placeholder {
+    color: var(--color-slate-300);
+    opacity: 1;
+}
+
+.dp--theme-dark .jepretin-date-input:focus,
+.dp--theme-dark .jepretin-date-input:hover:not(.dp--input-focus) {
+    border-color: var(--color-emerald-400);
+}
+
+.dp--theme-dark .jepretin-date-input:focus {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-emerald-400) 10%, transparent);
+}
+
+.dp--theme-dark .jepretin-date-input-error {
+    border-color: var(--color-rose-400);
+}
+
+.jepretin-date-menu {
+    border-radius: 1rem;
+    box-shadow: 0 24px 64px rgb(2 6 23 / 45%);
+}
+
+.jepretin-date-calendar {
+    padding: 0.25rem;
 }
