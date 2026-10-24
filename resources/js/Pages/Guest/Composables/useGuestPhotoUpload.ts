@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, ref } from 'vue'
 const MAX_SOURCE_SIZE = 20 * 1024 * 1024
 const MAX_COMPRESSED_SIZE = 10 * 1024 * 1024
 const MAX_IMAGE_EDGE = 2000
+const MAX_PHOTOS = 5
 const ALLOWED_TYPES: readonly string[] = ['image/jpeg', 'image/png', 'image/webp']
 
 interface DraftPhoto {
@@ -216,7 +217,10 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
                 } satisfies DraftPhoto
             }))
 
-            draftPhotos.value = restored.filter((photo) => photo.previewUrl.startsWith('data:'))
+            draftPhotos.value = restored
+                .filter((photo) => photo.previewUrl.startsWith('data:'))
+                .slice(0, MAX_PHOTOS)
+            persistDrafts()
         } catch {
             localStorage.removeItem(storageKeyFor(uploadToken))
         }
@@ -224,6 +228,12 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
 
     async function addFiles(fileList: FileList | File[] | null): Promise<void> {
         if (!fileList || fileList.length === 0) return
+
+        const remainingSlots = MAX_PHOTOS - draftPhotos.value.length
+        if (remainingSlots <= 0) {
+            error.value = `Maksimal ${MAX_PHOTOS} foto dapat diunggah sekaligus.`
+            return
+        }
 
         const nextFiles = Array.from(fileList)
         const validFiles = nextFiles.filter((file) => ALLOWED_TYPES.includes(file.type) && file.size <= MAX_SOURCE_SIZE)
@@ -236,7 +246,7 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
         error.value = ''
         success.value = ''
 
-        const prepared = await Promise.all(validFiles.map(async (file) => {
+        const prepared = await Promise.all(validFiles.slice(0, remainingSlots).map(async (file) => {
             const previewUrl = await fileToDataUrl(file)
 
             return {
@@ -251,6 +261,10 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
 
         draftPhotos.value = [...draftPhotos.value, ...prepared]
         persistDrafts()
+
+        if (validFiles.length > remainingSlots) {
+            error.value = `Maksimal ${MAX_PHOTOS} foto dapat diunggah sekaligus. Hanya ${remainingSlots} foto yang ditambahkan.`
+        }
     }
 
     function removeDraft(id: string): void {
@@ -265,6 +279,10 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
 
     async function uploadAll(): Promise<void> {
         if (draftPhotos.value.length === 0 || uploading.value) return
+        if (draftPhotos.value.length > MAX_PHOTOS) {
+            error.value = `Maksimal ${MAX_PHOTOS} foto dapat diunggah sekaligus.`
+            return
+        }
 
         error.value = ''
         success.value = ''
@@ -357,6 +375,7 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
 
     return {
         draftPhotos,
+        maxPhotos: MAX_PHOTOS,
         totalPhotosLabel,
         error,
         success,

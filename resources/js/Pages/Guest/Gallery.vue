@@ -147,15 +147,6 @@ async function loadMore(): Promise<void> {
                     <span v-if="eventDateLabel && event.location" aria-hidden="true"> · </span>
                     <span v-if="event.location">{{ event.location }}</span>
                 </p>
-                <div class="flex flex-wrap justify-center gap-3 pt-2">
-                    <a
-                        :href="event.uploadUrl"
-                        class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 focus:outline-none focus:ring-4 focus:ring-emerald-400/30"
-                    >
-                        <Camera :size="17" aria-hidden="true" />
-                        Bagikan foto
-                    </a>
-                </div>
             </div>
             </header>
 

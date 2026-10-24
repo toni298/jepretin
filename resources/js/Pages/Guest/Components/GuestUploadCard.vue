@@ -17,7 +17,7 @@ const props = defineProps<{
     }
 }>()
 
-const { draftPhotos, totalPhotosLabel, error, success, uploading, compressing, progress, addFiles, removeDraft, uploadAll } =
+const { draftPhotos, maxPhotos, totalPhotosLabel, error, success, uploading, compressing, progress, addFiles, removeDraft, uploadAll } =
     useGuestPhotoUpload(props.event.slug, props.event.uploadToken ?? undefined)
 
 const cameraInput = ref<HTMLInputElement | null>(null)
@@ -132,9 +132,9 @@ async function onFileChange(event: Event): Promise<void> {
 
             <section v-else class="space-y-4 rounded-2xl border border-[#dfd5c2] bg-white/80 p-3 text-left">
                 <div class="flex items-center justify-between gap-3">
-                    <p class="text-sm font-semibold text-stone-700">{{ totalPhotosLabel }}</p>
+                    <p class="text-sm font-semibold text-stone-700">{{ totalPhotosLabel }} (maks. {{ maxPhotos }})</p>
                     <button
-                        v-if="!uploading"
+                        v-if="!uploading && draftPhotos.length < maxPhotos"
                         type="button"
                         class="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-stone-700"
                         @click="galleryInput?.click()"
@@ -203,13 +203,6 @@ async function onFileChange(event: Event): Promise<void> {
             <p class="text-xs leading-5" :class="event.coverPhotoUrl ? 'text-white/60' : 'text-stone-400'">
                 Foto akan dikompresi sebelum diunggah. Maksimal 20 MB per foto. Gunakan sesi tamu lokal agar daftar foto tetap terpisah.
             </p>
-            <a
-                :href="event.galleryUrl"
-                class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#b5a277]/50 px-5 py-2.5 text-sm font-semibold transition hover:bg-white/70 focus:outline-none focus:ring-4 focus:ring-amber-500/20"
-                :class="event.coverPhotoUrl ? 'text-white hover:bg-white/10' : 'text-stone-700'"
-            >
-                Lihat galeri foto acara
-            </a>
         </div>
     </article>
 </template>
