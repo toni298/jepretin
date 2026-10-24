@@ -19,6 +19,8 @@ defineProps<{
         url: string
     }
 }>()
+
+const whatsappUrl = 'https://wa.me/628112797899?text=Halo%20Admin%20Jepretin%2C%20saya%20tertarik%20untuk%20membuat%20event.%20Mohon%20informasi%20lebih%20lanjut.'
 </script>
 
 <template>
@@ -26,14 +28,14 @@ defineProps<{
         <PageMetadata v-bind="seo" />
         <LandingNav :login-url="loginUrl" />
         <main>
-            <HeroSection :login-url="loginUrl" />
+            <HeroSection :whatsapp-url="whatsappUrl" />
             <FeatureGrid />
             <BrideSection :login-url="loginUrl" />
             <HowItWorksSection />
             <GallerySection :login-url="loginUrl" />
             <VendorSection :login-url="loginUrl" />
             <FaqSection />
-            <FinalCtaSection :login-url="loginUrl" />
+            <FinalCtaSection :whatsapp-url="whatsappUrl" />
         </main>
         <footer class="border-t border-white/[0.07] px-5 py-7 sm:px-8 lg:px-10">
             <div class="mx-auto flex max-w-7xl flex-col gap-4 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">

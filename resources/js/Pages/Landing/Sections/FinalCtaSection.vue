@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ loginUrl: string }>()
+defineProps<{ whatsappUrl: string }>()
 </script>
 
 <template>
@@ -11,7 +11,7 @@ defineProps<{ loginUrl: string }>()
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#ef938c]">Mulai Sekarang</p>
                 <h2 class="mt-4 text-3xl font-semibold leading-tight sm:text-4xl lg:text-[46px]">Abadikan Lebih Banyak <span class="text-[#f0a69a]">Momen Indah Bersama</span></h2>
                 <p class="mt-4 max-w-xl text-sm leading-6 text-white/65 sm:text-base">Buat event kamu sekarang dan kumpulkan cerita dari orang-orang terdekat.</p>
-                <a :href="loginUrl" class="mt-7 inline-flex min-h-12 items-center gap-3 rounded-full bg-gradient-to-r from-[#e76672] to-[#f3a28c] px-6 text-sm font-semibold text-[#1a1112] shadow-[0_12px_35px_rgba(231,102,114,.2)] transition hover:-translate-y-0.5 hover:brightness-110">Buat Event Sekarang <span aria-hidden="true">→</span></a>
+                <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer" class="mt-7 inline-flex min-h-12 items-center gap-3 rounded-full bg-gradient-to-r from-[#e76672] to-[#f3a28c] px-6 text-sm font-semibold text-[#1a1112] shadow-[0_12px_35px_rgba(231,102,114,.2)] transition hover:-translate-y-0.5 hover:brightness-110">Buat Event Sekarang <span aria-hidden="true">→</span></a>
             </div>
             <div class="hidden items-center gap-3 rounded-2xl border border-white/10 bg-[#171516]/85 p-4 shadow-2xl backdrop-blur-lg sm:flex">
                 <img :src="'/images/logo.webp'" alt="" class="size-12 rounded-xl">

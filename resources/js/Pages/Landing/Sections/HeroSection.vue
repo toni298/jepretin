@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ loginUrl: string }>()
+defineProps<{ whatsappUrl: string }>()
 </script>
 
 <template>
@@ -26,7 +26,7 @@ defineProps<{ loginUrl: string }>()
                     Kumpulkan foto candid dari tamu undangan melalui QR Code. Semua momen tersimpan otomatis, real-time, tanpa perlu menunggu hasil editing.
                 </p>
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-                    <a :href="loginUrl" class="inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#e76672] to-[#f3a28c] px-6 text-sm font-semibold text-[#1a1112] shadow-[0_12px_35px_rgba(231,102,114,.2)] transition hover:-translate-y-0.5 hover:brightness-110">
+                    <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#e76672] to-[#f3a28c] px-6 text-sm font-semibold text-[#1a1112] shadow-[0_12px_35px_rgba(231,102,114,.2)] transition hover:-translate-y-0.5 hover:brightness-110">
                         Buat Event Sekarang
                         <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" class="size-4"><path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
                     </a>
