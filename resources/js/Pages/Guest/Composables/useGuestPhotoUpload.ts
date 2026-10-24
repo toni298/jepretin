@@ -33,6 +33,7 @@ interface UploadSignature {
 interface UploadResult {
     photo: { id: string; url: string }
     message: string
+    uploadedCount: number
 }
 
 function isUploadSignature(value: unknown): value is UploadSignature {
@@ -50,6 +51,7 @@ function isUploadResult(value: unknown): value is UploadResult {
         && 'photo' in value && typeof value.photo === 'object' && value.photo !== null
         && 'id' in value.photo && typeof value.photo.id === 'string'
         && 'url' in value.photo && typeof value.photo.url === 'string'
+        && 'uploadedCount' in value && typeof value.uploadedCount === 'number'
 }
 
 function getXsrfToken(): string | undefined {
@@ -170,15 +172,23 @@ function uploadToStorage(
     })
 }
 
-export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
+export function useGuestPhotoUpload(
+    slug: string,
+    uploadToken: string | undefined,
+    initialUploadedPhotoCount: number,
+    maxPhotos: number,
+) {
     const error = ref('')
     const success = ref('')
     const uploading = ref(false)
     const compressing = ref(false)
     const progress = ref(0)
     const draftPhotos = ref<DraftPhoto[]>([])
+    const uploadedPhotoCount = ref(Math.min(initialUploadedPhotoCount, maxPhotos))
 
     const totalPhotosLabel = computed(() => `${draftPhotos.value.length} foto siap diunggah`)
+    const isAtUploadLimit = computed(() => uploadedPhotoCount.value >= maxPhotos)
+    const canAddPhotos = computed(() => !isAtUploadLimit.value && uploadedPhotoCount.value + draftPhotos.value.length < maxPhotos)
 
     function persistDrafts(): void {
         if (!uploadToken) return
@@ -219,7 +229,7 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
 
             draftPhotos.value = restored
                 .filter((photo) => photo.previewUrl.startsWith('data:'))
-                .slice(0, MAX_PHOTOS)
+                .slice(0, Math.max(0, maxPhotos - uploadedPhotoCount.value))
             persistDrafts()
         } catch {
             localStorage.removeItem(storageKeyFor(uploadToken))
@@ -228,10 +238,14 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
 
     async function addFiles(fileList: FileList | File[] | null): Promise<void> {
         if (!fileList || fileList.length === 0) return
+        if (isAtUploadLimit.value) {
+            error.value = `Maksimal ${maxPhotos} foto dapat diunggah pada perangkat ini untuk acara tersebut.`
+            return
+        }
 
-        const remainingSlots = MAX_PHOTOS - draftPhotos.value.length
+        const remainingSlots = maxPhotos - uploadedPhotoCount.value - draftPhotos.value.length
         if (remainingSlots <= 0) {
-            error.value = `Maksimal ${MAX_PHOTOS} foto dapat diunggah sekaligus.`
+            error.value = `Maksimal ${maxPhotos} foto dapat diunggah pada perangkat ini untuk acara tersebut.`
             return
         }
 
@@ -263,7 +277,7 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
         persistDrafts()
 
         if (validFiles.length > remainingSlots) {
-            error.value = `Maksimal ${MAX_PHOTOS} foto dapat diunggah sekaligus. Hanya ${remainingSlots} foto yang ditambahkan.`
+            error.value = `Maksimal ${maxPhotos} foto dapat diunggah pada perangkat ini. Hanya ${remainingSlots} foto yang ditambahkan.`
         }
     }
 
@@ -279,8 +293,8 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
 
     async function uploadAll(): Promise<void> {
         if (draftPhotos.value.length === 0 || uploading.value) return
-        if (draftPhotos.value.length > MAX_PHOTOS) {
-            error.value = `Maksimal ${MAX_PHOTOS} foto dapat diunggah sekaligus.`
+        if (isAtUploadLimit.value || uploadedPhotoCount.value + draftPhotos.value.length > maxPhotos) {
+            error.value = `Maksimal ${maxPhotos} foto dapat diunggah pada perangkat ini untuk acara tersebut.`
             return
         }
 
@@ -352,6 +366,7 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
                 if (!isUploadResult(storePayload)) {
                     throw new Error('Server tidak memberikan konfirmasi untuk semua foto yang diunggah.')
                 }
+                uploadedPhotoCount.value = storePayload.uploadedCount
             }
 
             success.value = `${uploadResults.length} foto berhasil diunggah ke galeri acara.`
@@ -375,7 +390,10 @@ export function useGuestPhotoUpload(slug: string, uploadToken?: string) {
 
     return {
         draftPhotos,
-        maxPhotos: MAX_PHOTOS,
+        uploadedPhotoCount,
+        maxPhotos,
+        isAtUploadLimit,
+        canAddPhotos,
         totalPhotosLabel,
         error,
         success,

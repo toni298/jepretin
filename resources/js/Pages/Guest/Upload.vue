@@ -13,6 +13,8 @@ defineProps<{
         location: string | null
         coverPhotoUrl: string | null
         galleryUrl: string
+        guestPhotoCount: number
+        maxGuestPhotos: number
     }
     seo: {
         title: string

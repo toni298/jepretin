@@ -4,17 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ShowGuestEventRequest;
 use App\Models\Event;
+use App\Services\GuestPhotoQuota;
 use App\Services\QrCodeService;
 use App\Services\SupabaseStorage;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class GuestEventController extends Controller
 {
-    public function upload(Event $publicEvent, SupabaseStorage $storage): Response
-    {
+    public function upload(
+        Event $publicEvent,
+        SupabaseStorage $storage,
+        Request $request,
+        GuestPhotoQuota $quota,
+    ): Response {
         abort_unless($publicEvent->status === 'active', 404);
+        $deviceId = $quota->ensureDeviceId($request);
+
         $coverPhotoUrl = $publicEvent->cover_photo_path
             ? $storage->publicUrl($publicEvent->cover_photo_path)
             : null;
@@ -30,6 +38,8 @@ class GuestEventController extends Controller
                 'location' => $publicEvent->location,
                 'coverPhotoUrl' => $coverPhotoUrl,
                 'galleryUrl' => route('public.events.gallery', ['publicEvent' => $publicEvent->slug]),
+                'guestPhotoCount' => $quota->uploadedCount($publicEvent, $quota->deviceHash($deviceId)),
+                'maxGuestPhotos' => GuestPhotoQuota::MAX_PHOTOS,
             ],
             'seo' => $this->eventMetadata(
                 $publicEvent,
@@ -39,9 +49,13 @@ class GuestEventController extends Controller
         ]);
     }
 
-    public function uploadByToken(Event $uploadToken, SupabaseStorage $storage): Response
-    {
-        return $this->upload($uploadToken, $storage);
+    public function uploadByToken(
+        Event $uploadToken,
+        SupabaseStorage $storage,
+        Request $request,
+        GuestPhotoQuota $quota,
+    ): Response {
+        return $this->upload($uploadToken, $storage, $request, $quota);
     }
 
     public function invitation(ShowGuestEventRequest $request, Event $publicEvent, SupabaseStorage $storage): Response

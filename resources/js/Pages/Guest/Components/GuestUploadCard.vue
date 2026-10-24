@@ -14,11 +14,32 @@ const props = defineProps<{
         location: string | null
         coverPhotoUrl: string | null
         galleryUrl: string
+        guestPhotoCount: number
+        maxGuestPhotos: number
     }
 }>()
 
-const { draftPhotos, maxPhotos, totalPhotosLabel, error, success, uploading, compressing, progress, addFiles, removeDraft, uploadAll } =
-    useGuestPhotoUpload(props.event.slug, props.event.uploadToken ?? undefined)
+const {
+    draftPhotos,
+    uploadedPhotoCount,
+    maxPhotos,
+    isAtUploadLimit,
+    canAddPhotos,
+    totalPhotosLabel,
+    error,
+    success,
+    uploading,
+    compressing,
+    progress,
+    addFiles,
+    removeDraft,
+    uploadAll,
+} = useGuestPhotoUpload(
+    props.event.slug,
+    props.event.uploadToken ?? undefined,
+    props.event.guestPhotoCount,
+    props.event.maxGuestPhotos,
+)
 
 const cameraInput = ref<HTMLInputElement | null>(null)
 const galleryInput = ref<HTMLInputElement | null>(null)
@@ -114,6 +135,7 @@ async function onFileChange(event: Event): Promise<void> {
                 <button
                     v-if="isMobile"
                     type="button"
+                    :disabled="isAtUploadLimit || !canAddPhotos || uploading"
                     class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 focus:outline-none focus:ring-4 focus:ring-emerald-400/30"
                     @click="cameraInput?.click()"
                 >
@@ -122,6 +144,7 @@ async function onFileChange(event: Event): Promise<void> {
                 </button>
                 <button
                     type="button"
+                    :disabled="isAtUploadLimit || !canAddPhotos || uploading"
                     class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#b5a277]/50 bg-white/70 px-5 py-3 text-sm font-semibold text-stone-800 transition hover:bg-white focus:outline-none focus:ring-4 focus:ring-amber-500/20"
                     @click="galleryInput?.click()"
                 >
@@ -132,10 +155,13 @@ async function onFileChange(event: Event): Promise<void> {
 
             <section v-else class="space-y-4 rounded-2xl border border-[#dfd5c2] bg-white/80 p-3 text-left">
                 <div class="flex items-center justify-between gap-3">
-                    <p class="text-sm font-semibold text-stone-700">{{ totalPhotosLabel }} (maks. {{ maxPhotos }})</p>
+                    <p class="text-sm font-semibold text-stone-700">
+                        {{ totalPhotosLabel }} · {{ uploadedPhotoCount }}/{{ maxPhotos }} sudah diunggah
+                    </p>
                     <button
-                        v-if="!uploading && draftPhotos.length < maxPhotos"
+                        v-if="!uploading"
                         type="button"
+                        :disabled="isAtUploadLimit || !canAddPhotos"
                         class="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-stone-700"
                         @click="galleryInput?.click()"
                     >
@@ -162,7 +188,8 @@ async function onFileChange(event: Event): Promise<void> {
                 <div class="flex flex-wrap gap-2">
                     <button
                         type="button"
-                        class="inline-flex items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                        :disabled="isAtUploadLimit || !canAddPhotos || uploading"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
                         @click="cameraInput?.click()"
                     >
                         <Camera :size="16" aria-hidden="true" />
@@ -170,7 +197,7 @@ async function onFileChange(event: Event): Promise<void> {
                     </button>
                     <button
                         type="button"
-                        :disabled="uploading"
+                        :disabled="uploading || isAtUploadLimit"
                         class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
                         @click="uploadAll()"
                     >

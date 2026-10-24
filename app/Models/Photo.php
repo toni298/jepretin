@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'original_filename',
     'mime_type',
     'file_size',
+    'guest_device_hash',
     'status',
 ])]
 class Photo extends Model
